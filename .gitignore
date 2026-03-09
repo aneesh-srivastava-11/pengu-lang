@@ -1,0 +1,11 @@
+# Binaries
+pengu
+pengu.exe
+
+# Generated output from the CLI
+generated/
+
+# OS/IDE specific files
+.DS_Store
+.idea/
+.vscode/
