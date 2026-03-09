@@ -14,15 +14,15 @@ Clone the repository and build the CLI tool:
 ```bash
 git clone https://github.com/yourusername/pengu-lang
 cd pengu-lang
-go build -o pengu ./cli/main.go
+go build -o pengu.exe ./cli/main.go
 ```
 
 ## Usage commands
 
-* `pengu init` : Creates starter `.ms` files in `./examples`
-* `pengu generate <file.ms>` : Only generates the Go code into `./generated`
-* `pengu build <file.ms>` : Generates the Go code and builds it into a binary executable
-* `pengu run <file.ms>` : Generates the Go code and runs it immediately using `go run`
+* `pengu.exe init` : Creates starter `.ms` files in `./examples`
+* `pengu.exe generate <file.ms>` : Only generates the Go code into `./generated`
+* `pengu.exe build <file.ms>` : Generates the Go code and builds it into a binary executable
+* `pengu.exe run <file.ms>` : Generates the Go code and runs it immediately using `go run`
 
 ## Syntax Example
 Save this as `service.ms`:

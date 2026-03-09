@@ -23,19 +23,19 @@ func main() {
 		initProject()
 	case "generate":
 		if len(os.Args) < 3 {
-			fmt.Println("Usage: pengu generate <file.ms>")
+			fmt.Println("Usage: pengu.exe generate <file.ms>")
 			os.Exit(1)
 		}
 		generateCode(os.Args[2])
 	case "build":
 		if len(os.Args) < 3 {
-			fmt.Println("Usage: pengu build <file.ms>")
+			fmt.Println("Usage: pengu.exe build <file.ms>")
 			os.Exit(1)
 		}
 		buildBinary(os.Args[2])
 	case "run":
 		if len(os.Args) < 3 {
-			fmt.Println("Usage: pengu run <file.ms>")
+			fmt.Println("Usage: pengu.exe run <file.ms>")
 			os.Exit(1)
 		}
 		runService(os.Args[2])
@@ -117,7 +117,7 @@ func generateCode(filename string) string {
 func buildBinary(filename string) {
 	outPath := generateCode(filename)
 	baseName := strings.TrimSuffix(filepath.Base(filename), filepath.Ext(filename))
-	
+
 	binName := baseName
 	if os.PathSeparator == '\\' {
 		binName += ".exe"
