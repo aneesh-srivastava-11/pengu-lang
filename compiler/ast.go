@@ -14,8 +14,13 @@ type Route struct {
 }
 
 type Service struct {
-	Version string
-	Name    string
-	Routes  []Route
-	Line    int
+	Version        string
+	Name           string
+	Routes         []Route
+	Middleware     []string
+	HealthEnabled  bool
+	MetricsEnabled bool
+	HasJson        bool
+	HasAuth        bool
+	Line           int
 }

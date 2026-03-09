@@ -46,6 +46,25 @@ version 1`,
 				{Type: compiler.TokenEOF, Literal: "", Line: 3, Indent: 0},
 			},
 		},
+		{
+			name: "V2 features",
+			input: `middleware logging
+health enable
+parse json UserReq
+auth jwt`,
+			expected: []compiler.Token{
+				{Type: compiler.TokenMiddleware, Literal: "middleware", Line: 1, Indent: 0},
+				{Type: compiler.TokenIdent, Literal: "logging", Line: 1, Indent: 0},
+				{Type: compiler.TokenHealth, Literal: "health", Line: 2, Indent: 0},
+				{Type: compiler.TokenEnable, Literal: "enable", Line: 2, Indent: 0},
+				{Type: compiler.TokenParse, Literal: "parse", Line: 3, Indent: 0},
+				{Type: compiler.TokenJson, Literal: "json", Line: 3, Indent: 0},
+				{Type: compiler.TokenIdent, Literal: "UserReq", Line: 3, Indent: 0},
+				{Type: compiler.TokenAuth, Literal: "auth", Line: 4, Indent: 0},
+				{Type: compiler.TokenIdent, Literal: "jwt", Line: 4, Indent: 0},
+				{Type: compiler.TokenEOF, Literal: "", Line: 5, Indent: 0},
+			},
+		},
 	}
 
 	for _, tt := range tests {

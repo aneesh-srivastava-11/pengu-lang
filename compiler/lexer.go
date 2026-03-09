@@ -8,24 +8,38 @@ import (
 type TokenType string
 
 const (
-	TokenEOF     TokenType = "EOF"
-	TokenIdent   TokenType = "IDENT"
-	TokenString  TokenType = "STRING"
-	TokenNumber  TokenType = "NUMBER"
+	TokenEOF    TokenType = "EOF"
+	TokenIdent  TokenType = "IDENT"
+	TokenString TokenType = "STRING"
+	TokenNumber TokenType = "NUMBER"
 
-	TokenVersion TokenType = "VERSION"
-	TokenService TokenType = "SERVICE"
-	TokenRoute   TokenType = "ROUTE"
-	TokenLog     TokenType = "LOG"
-	TokenRespond TokenType = "RESPOND"
+	TokenVersion    TokenType = "VERSION"
+	TokenService    TokenType = "SERVICE"
+	TokenRoute      TokenType = "ROUTE"
+	TokenLog        TokenType = "LOG"
+	TokenRespond    TokenType = "RESPOND"
+	TokenMiddleware TokenType = "MIDDLEWARE"
+	TokenHealth     TokenType = "HEALTH"
+	TokenMetrics    TokenType = "METRICS"
+	TokenEnable     TokenType = "ENABLE"
+	TokenParse      TokenType = "PARSE"
+	TokenJson       TokenType = "JSON"
+	TokenAuth       TokenType = "AUTH"
 )
 
 var keywords = map[string]TokenType{
-	"version": TokenVersion,
-	"service": TokenService,
-	"route":   TokenRoute,
-	"log":     TokenLog,
-	"respond": TokenRespond,
+	"version":    TokenVersion,
+	"service":    TokenService,
+	"route":      TokenRoute,
+	"log":        TokenLog,
+	"respond":    TokenRespond,
+	"middleware": TokenMiddleware,
+	"health":     TokenHealth,
+	"metrics":    TokenMetrics,
+	"enable":     TokenEnable,
+	"parse":      TokenParse,
+	"json":       TokenJson,
+	"auth":       TokenAuth,
 }
 
 type Token struct {

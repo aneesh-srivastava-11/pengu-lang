@@ -61,12 +61,51 @@ func (p *Parser) Parse() (*Service, error) {
 	service.Name = p.current().Literal
 	p.pos++
 
-	// Parse Routes
+	// Parse Service Configs and Routes
 	for p.current().Type != TokenEOF {
-		if p.current().Type == TokenRoute {
+		if p.current().Type == TokenMiddleware {
+			p.pos++
+
+			middlewareName := ""
+			if p.current().Type == TokenIdent {
+				middlewareName = p.current().Literal
+				p.pos++
+			} else if p.current().Type == TokenAuth {
+				middlewareName = p.current().Literal
+				p.pos++
+			} else {
+				return nil, fmt.Errorf("line %d: expected middleware name", p.current().Line)
+			}
+
+			// Support optional second identifier (e.g. auth jwt)
+			if p.current().Type == TokenIdent {
+				middlewareName += " " + p.current().Literal
+				p.pos++
+			}
+			service.Middleware = append(service.Middleware, middlewareName)
+		} else if p.current().Type == TokenHealth {
+			p.pos++
+			if err := p.expect(TokenEnable); err != nil {
+				return nil, fmt.Errorf("line %d: expected 'enable' after 'health'", p.current().Line)
+			}
+			service.HealthEnabled = true
+		} else if p.current().Type == TokenMetrics {
+			p.pos++
+			if err := p.expect(TokenEnable); err != nil {
+				return nil, fmt.Errorf("line %d: expected 'enable' after 'metrics'", p.current().Line)
+			}
+			service.MetricsEnabled = true
+		} else if p.current().Type == TokenRoute {
 			route, err := p.parseRoute()
 			if err != nil {
 				return nil, err
+			}
+			for _, action := range route.Actions {
+				if action.Type == "parse_json" {
+					service.HasJson = true
+				} else if action.Type == "auth" {
+					service.HasAuth = true
+				}
 			}
 			service.Routes = append(service.Routes, route)
 		} else {
@@ -113,7 +152,7 @@ func (p *Parser) parseRoute() (Route, error) {
 		if p.current().Indent <= routeIndent {
 			return Route{}, fmt.Errorf("line %d: actions inside routes must be indented", p.current().Line)
 		}
-		
+
 		action, err := p.parseAction()
 		if err != nil {
 			return Route{}, err
@@ -145,10 +184,29 @@ func (p *Parser) parseAction() (Action, error) {
 		}
 		action.Args = append(action.Args, p.current().Literal)
 		p.pos++
-		
+
 		if p.current().Type != TokenString {
 			return Action{}, fmt.Errorf("line %d: respond requires status code and message", p.current().Line)
 		}
+		action.Args = append(action.Args, p.current().Literal)
+		p.pos++
+	case TokenParse:
+		p.pos++
+		if err := p.expect(TokenJson); err != nil {
+			return Action{}, fmt.Errorf("line %d: expected 'json' after 'parse'", p.current().Line)
+		}
+		if p.current().Type != TokenIdent {
+			return Action{}, fmt.Errorf("line %d: expected struct name after 'parse json'", p.current().Line)
+		}
+		action.Type = "parse_json"
+		action.Args = append(action.Args, p.current().Literal)
+		p.pos++
+	case TokenAuth:
+		p.pos++
+		if p.current().Type != TokenIdent {
+			return Action{}, fmt.Errorf("line %d: expected auth type (e.g., jwt)", p.current().Line)
+		}
+		action.Type = "auth"
 		action.Args = append(action.Args, p.current().Literal)
 		p.pos++
 	default:

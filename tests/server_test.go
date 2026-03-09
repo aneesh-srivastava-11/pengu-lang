@@ -14,13 +14,17 @@ import (
 func TestE2EServer(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	msContent := `version 1
+	msContent := `version 2
 service e2e_test
+
+health enable
+metrics enable
 
 route GET "/ping"
     respond 200 "pong"
 
 route POST "/data"
+    parse json MyReq
     respond 201 "created"
 `
 	msFile := filepath.Join(tmpDir, "e2e_app.ms")
@@ -63,19 +67,36 @@ route POST "/data"
 		t.Errorf("Expected GET body 'pong', got %s", string(body))
 	}
 
-	// Test POST /data
-	resp, err = http.Post("http://localhost:8080/data", "text/plain", strings.NewReader(""))
+	// Test POST /data (Valid JSON)
+	resp, err = http.Post("http://localhost:8080/data", "application/json", strings.NewReader(`{"name":"test"}`))
 	if err != nil {
 		t.Fatalf("Failed to send POST request: %v", err)
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusCreated { // Note: compiler actually generates string literal like "respond 201"
-		// Actually wait, 'respond 201' sends a 201 status code! Correct!
+	if resp.StatusCode != http.StatusCreated {
 		t.Errorf("Expected POST status 201, got %d", resp.StatusCode)
 	}
 	body, _ = io.ReadAll(resp.Body)
 	if string(body) != "created" {
 		t.Errorf("Expected POST body 'created', got %s", string(body))
+	}
+
+	// Test POST /data (Invalid JSON parsing)
+	resp, err = http.Post("http://localhost:8080/data", "application/json", strings.NewReader(`{bad json`))
+	if err == nil {
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusBadRequest {
+			t.Errorf("Expected Bad Request for invalid json, got %d", resp.StatusCode)
+		}
+	}
+
+	// Test GET /health
+	resp, err = http.Get("http://localhost:8080/health")
+	if err == nil {
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			t.Errorf("Expected health status 200, got %d", resp.StatusCode)
+		}
 	}
 }

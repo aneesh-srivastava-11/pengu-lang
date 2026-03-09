@@ -54,6 +54,41 @@ respond 200 "hello"`, // no indent
 			expectErr:   true,
 			errContains: "actions inside routes must be indented",
 		},
+		{
+			name: "V2 complete service",
+			input: `version 2
+service advanced
+middleware logging
+middleware auth jwt
+health enable
+metrics enable
+
+route POST "/data"
+    parse json MyReqStruct
+    auth jwt
+    respond 201 "ok"`,
+			expected: &compiler.Service{
+				Version:        "2",
+				Name:           "advanced",
+				Line:           1,
+				Middleware:     []string{"logging", "auth jwt"},
+				HealthEnabled:  true,
+				MetricsEnabled: true,
+				Routes: []compiler.Route{
+					{
+						Method: "POST",
+						Path:   "/data",
+						Line:   8,
+						Actions: []compiler.Action{
+							{Type: "parse_json", Args: []string{"MyReqStruct"}, Line: 9},
+							{Type: "auth", Args: []string{"jwt"}, Line: 10},
+							{Type: "respond", Args: []string{"201", "ok"}, Line: 11},
+						},
+					},
+				},
+			},
+			expectErr: false,
+		},
 	}
 
 	for _, tt := range tests {
